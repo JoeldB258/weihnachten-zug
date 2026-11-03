@@ -354,7 +354,7 @@ function safeName(n){return String(n).replace(/ä/g,"ae").replace(/ö/g,"oe").re
 function anchorDl(href,name){const a=document.createElement("a");a.href=href;a.download=safeName(name);a.rel="noopener";document.body.append(a);a.click();a.remove()}
 const touch=matchMedia("(pointer: coarse)").matches||/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 function dlLink(msg,url){msg.textContent="Download gestartet. Falls nichts passiert: ";const x=document.createElement("a");x.href=url;x.target="_blank";x.rel="noopener";x.textContent="Datei öffnen";x.style.fontWeight="700";x.style.textDecoration="underline";x.style.color="inherit";msg.append(x)}
-function saveOne(url,name,btn,msg,big){anchorDl(url,name);dlLink(msg,url)}
+async function saveOne(url,name,btn,msg,big){if(/\.pdf$/i.test(url)){btn.disabled=true;msg.textContent="Wird vorbereitet …";try{const r=await fetch(url);if(!r.ok)throw 0;const b=new Blob([await r.arrayBuffer()],{type:"application/octet-stream"});const u=URL.createObjectURL(b);anchorDl(u,name);setTimeout(()=>URL.revokeObjectURL(u),120000)}catch(e){anchorDl(url,name)}finally{btn.disabled=false}dlLink(msg,url);return}anchorDl(url,name);dlLink(msg,url)}
 function saveZip(name,parts,btn,msg){const u="zip/"+safeName(name).replace(/ /g,"_");anchorDl(u,name);dlLink(msg,u)}
 const zipParts=(s,f,folder)=>s[f].i.map(x=>({u:x.u,path:(folder?folder+"/":"")+x.n}));
 const zipName=(s,f)=>"Weihnachten-Zug-2026_Social_"+s.slug+(f?"_"+f:"")+".zip";
